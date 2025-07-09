@@ -18,6 +18,10 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
+      env:
+             TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+             TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
       run: npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -25,3 +29,4 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+   
