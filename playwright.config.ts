@@ -2,18 +2,19 @@ import { defineConfig } from '@playwright/test';
 import path from 'path';
 import * as dotenv from 'dotenv';
 
-
-// Load .env variables
+// Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-// Validate env vars
-const username = process.env.TEST_USERNAME;
-const password = process.env.TEST_PASSWORD;
-const apiToken = process.env.API_TOKEN;
+// Get credentials from env or CI secrets
+const username = process.env.TEST_USERNAME || '';
+const password = process.env.TEST_PASSWORD || '';
+// const apiToken = process.env.API_TOKEN || '';
 
+// Fail only if username/password are missing
 if (!username) throw new Error('TEST_USERNAME is not defined!');
 if (!password) throw new Error('TEST_PASSWORD is not defined!');
-if (!apiToken) throw new Error('API_TOKEN is not defined!');
+// Optional: API token validation
+// if (!apiToken) console.warn('API_TOKEN is not defined. Skipping API tests.');
 
 export default defineConfig({
   timeout: 30 * 1000,
@@ -29,44 +30,15 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+   // extraHTTPHeaders: {
+      // Only add API token header if defined
+      // Authorization: apiToken ? `Bearer ${apiToken}` : undefined,
+   // },
   },
   projects: [
-    {
-      name: 'Chromium',
-      use: {
-        browserName: 'chromium',
-        username,
-        password,
-        apiToken,
-        extraHTTPHeaders: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      },
-    },
-    {
-      name: 'Firefox',
-      use: {
-        browserName: 'firefox',
-        username,
-        password,
-        apiToken,
-        extraHTTPHeaders: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      },
-    },
-    {
-      name: 'WebKit',
-      use: {
-        browserName: 'webkit',
-        username,
-        password,
-        apiToken,
-        extraHTTPHeaders: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      },
-    },
+    { name: 'Chromium', use: { browserName: 'chromium' } },
+    { name: 'Firefox',  use: { browserName: 'firefox' } },
+    { name: 'WebKit',   use: { browserName: 'webkit' } },
   ],
   outputDir: 'test-results/',
 });
